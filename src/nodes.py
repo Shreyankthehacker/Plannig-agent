@@ -1,4 +1,4 @@
-from jupyter_client import KernelManager
+#from jupyter_client import KernelManager
 from state import GraphState
 import re
 from langchain.prompts import ChatPromptTemplate
@@ -19,48 +19,48 @@ from prompts import code_prompt,PLANNING_PROMPT,GRADE_PROMPT
 SERP = os.environ["SERPAPI_API_KEY"]
 
 
-def run_in_jupyter_kernel(code: str) -> str:
-    """
-    Executes Python code in a temporary Jupyter kernel and returns the output.
+# def run_in_jupyter_kernel(code: str) -> str:
+#     """
+#     Executes Python code in a temporary Jupyter kernel and returns the output.
     
-    Args:
-        code (str): Python code to execute.
+#     Args:
+#         code (str): Python code to execute.
         
-    Returns:
-        str: Output from the execution (stdout or error).
-    """
-    # Start a kernel
-    ##print('kernel')
-    km = KernelManager()
-    km.start_kernel()
-    kc = km.client()
-    kc.start_channels()
+#     Returns:
+#         str: Output from the execution (stdout or error).
+#     """
+#     # Start a kernel
+#     ##print('kernel')
+#     km = KernelManager()
+#     km.start_kernel()
+#     kc = km.client()
+#     kc.start_channels()
 
-    try:
-        # Send the code for execution
-        kc.execute(code)
+#     try:
+#         # Send the code for execution
+#         kc.execute(code)
 
-        # Collect output
-        output = ""
-        while True:
-            msg = kc.get_iopub_msg()
-            msg_type = msg['msg_type']
+#         # Collect output
+#         output = ""
+#         while True:
+#             msg = kc.get_iopub_msg()
+#             msg_type = msg['msg_type']
 
-            if msg_type == 'stream':
-                output += msg['content']['text']
-            elif msg_type == 'execute_result':
-                output += str(msg['content']['data']['text/plain'])
-            elif msg_type == 'error':
-                output += '\n'.join(msg['content']['traceback'])
-            elif msg_type == 'status' and msg['content']['execution_state'] == 'idle':
-                break
+#             if msg_type == 'stream':
+#                 output += msg['content']['text']
+#             elif msg_type == 'execute_result':
+#                 output += str(msg['content']['data']['text/plain'])
+#             elif msg_type == 'error':
+#                 output += '\n'.join(msg['content']['traceback'])
+#             elif msg_type == 'status' and msg['content']['execution_state'] == 'idle':
+#                 break
 
-        return output.strip()
+#         return output.strip()
 
-    finally:
-        # Clean up kernel
-        kc.stop_channels()
-        km.shutdown_kernel()
+#     finally:
+#         # Clean up kernel
+#         kc.stop_channels()
+#         km.shutdown_kernel()
 
 
 
@@ -88,11 +88,11 @@ def code_generation(state: GraphState):
     chain = prompt | llm 
     code_response = chain.invoke({'sub_task': task})
     code = extract_code_from_aimessage(code_response)
-    output = run_in_jupyter_kernel(code)
+  #  output = run_in_jupyter_kernel(code)
     result = (
         f"Task: {task}\n"
         f"Generated Code:\n```python\n{code}\n```\n"
-        f"Output:\n{output}"
+       # f"Output:\n{output}"
     )
 
     return {'code': state.code + [result],'current_task_index':state.current_task_index+1}
@@ -153,7 +153,7 @@ def youtube_search_serpapi(state: GraphState):
     'final_output': state.final_output + ["The YouTube videos suggested are:"]+  formatted_results,'current_task_index':state.current_task_index+1}
 
 
-tools = [websearch,wiki_explainer_tool,code_generation,run_in_jupyter_kernel]
+tools = [websearch,wiki_explainer_tool,code_generation]
 
 llm = llm.bind_tools(tools = tools)
 
@@ -189,7 +189,6 @@ def router_node(state):
         "websearch",
         "wiki_explainer_tool",
         "code_generation",
-        "run_in_jupyter_kernel",
         "youtube_search_serpapi"
     ]
     

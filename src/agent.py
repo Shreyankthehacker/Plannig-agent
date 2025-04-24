@@ -1,4 +1,4 @@
-from nodes import websearch,youtube_search_serpapi,break_task,code_generation,continue_or_not,llm,router_node,wiki_explainer_tool,run_in_jupyter_kernel,grading
+from nodes import websearch,youtube_search_serpapi,break_task,code_generation,continue_or_not,llm,router_node,wiki_explainer_tool,grading
 import os 
 from  state import GraphState
 
@@ -33,7 +33,7 @@ builder = StateGraph(GraphState)
 builder.add_node(websearch)
 builder.add_node(wiki_explainer_tool)
 builder.add_node(code_generation)
-builder.add_node(run_in_jupyter_kernel)
+#builder.add_node(run_in_jupyter_kernel)
 builder.add_node(youtube_search_serpapi)
 builder.add_node(grading)
 builder.add_node(break_task)
@@ -49,7 +49,7 @@ builder.add_edge("websearch", "grading")
 builder.add_edge("wiki_explainer_tool", "grading")
 builder.add_edge("youtube_search_serpapi", "grading")
 builder.add_edge("code_generation", "grading")
-builder.add_edge("run_in_jupyter_kernel", "grading")
+#builder.add_edge("run_in_jupyter_kernel", "grading")
 builder.add_conditional_edges("grading", continue_or_not)  
 
 
